@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RISE – Your Morning Brief</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-main: #060515;
+      --bg-elevated: rgba(18, 13, 40, 0.9);
+      --accent-gold: #f7d58b;
+      --accent-gold-soft: rgba(247, 213, 139, 0.18);
+      --accent-purple: #7c5cff;
+      --accent-purple-soft: rgba(124, 92, 255, 0.12);
+      --accent-teal: #46d9c8;
+      --text-primary: #f8f6ff;
+      --text-muted: #a7a2c8;
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --shadow-soft: 0 24px 80px rgba(0, 0, 0, 0.75);
+      --radius-xl: 24px;
+      --radius-lg: 16px;
+      --radius-pill: 999px;
+      --blur-card: 20px;
+      --transition-fast: 0.18s ease-out;
+      --transition-med: 0.26s ease-out;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: "Inter", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 10% -10%, rgba(124, 92, 255, 0.22), transparent 60%),
+        radial-gradient(circle at 120% 10%, rgba(70, 217, 200, 0.16), transparent 55%),
+        radial-gradient(circle at 50% 130%, rgba(247, 213, 139, 0.12), transparent 60%),
+        linear-gradient(145deg, #02000b, #050318, #02000b);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 18px;
+    }
+    .rise-shell {
+      position: relative;
+      width: 100%;
+      max-width: 1120px;
+      min-height: 620px;
+      border-radius: 32px;
+      padding: 22px 22px 26px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+    .rise-shell::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.09) 0, transparent 50%),
+        radial-gradient(circle at 80% 0%, rgba(247, 213, 139, 0.10) 0, transparent 45%),
+        radial-gradient(circle at 5% 100%, rgba(124, 92, 255, 0.13) 0, transparent 55%);
+      opacity: 0.45;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+    .rise-shell-inner {
+      position: relative;
+      z-index: 1;
+      backdrop-filter: blur(var(--blur-card));
+      border-radius: 24px;
+      background: radial-gradient(circle at top, rgba(34, 29, 70, 0.95), rgba(6, 5, 21, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 20px 22px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .rise-topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .rise-brand { display: flex; align-items: center; gap: 10px; }
+    .rise-orb {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #ffffff, #f7d58b 40%, #7c5cff 70%, #060515 100%);
+      box-shadow: 0 0 24px rgba(247, 213, 139, 0.65), 0 0 48px rgba(124, 92, 255, 0.65);
+      position: relative; overflow: hidden;
+    }
+    .rise-orb::after { content: ""; position: absolute; inset: 1px; border-radius: inherit; border: 1px solid rgba(255,255,255,0.4); mix-blend-mode: screen; opacity: 0.8; }
+    .rise-title { display: flex; flex-direction: column; gap: 2px; }
+    .rise-title-main { font-family: "Cinzel", serif; letter-spacing: 0.12em; font-size: 15px; text-transform: uppercase; color: var(--accent-gold); }
+    .rise-title-sub { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.18em; }
+    .rise-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: var(--radius-pill); border: 1px solid var(--border-subtle); background: linear-gradient(135deg, rgba(8,7,30,0.9), rgba(30,22,70,0.96)); font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+    .pill-label { text-transform: uppercase; letter-spacing: 0.16em; font-weight: 500; font-size: 10px; color: rgba(167,162,200,0.9); }
+    .pill-main { color: var(--accent-gold); font-weight: 500; }
+    .pill-dot { width: 4px; height: 4px; border-radius: 999px; background: radial-gradient(circle, #f7d58b, #f7b66a); box-shadow: 0 0 12px rgba(247,213,139,0.7); }
+    .pill-input { background: rgba(8,7,30,0.95); border-radius: var(--radius-pill); padding: 6px 10px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.09); }
+    .pill-input span { font-size: 10px; text-transform: uppercase; letter-spacing: 0.16em; color: rgba(167,162,200,0.9); }
+    .pill-input input { background: transparent; border: none; outline: none; font-size: 12px; color: var(--text-primary); font-weight: 500; min-width: 90px; }
+    .pill-input input::placeholder { color: rgba(167,162,200,0.6); }
+    .rise-tabs { display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(13,9,36,0.92), rgba(41,30,88,0.95)); border-radius: var(--radius-pill); padding: 4px; border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 14px 40px rgba(0,0,0,0.5); margin-top: 6px; }
+    .rise-tab { flex: 1; position: relative; border-radius: 999px; padding: 7px 14px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 1px; cursor: pointer; transition: background var(--transition-med), transform var(--transition-fast); overflow: hidden; border: none; background: transparent; }
+    .rise-tab:hover { transform: translateY(-1px); }
+    .rise-tab-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.16em; color: rgba(167,162,200,0.95); font-weight: 500; }
+    .rise-tab-title { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+    .rise-tab.active { background: radial-gradient(circle at 0% 0%, rgba(247,213,139,0.18), transparent 65%), linear-gradient(135deg, rgba(6,5,21,0.16), rgba(247,213,139,0.05)); box-shadow: 0 14px 40px rgba(247,213,139,0.18); }
+    .rise-tab.active .rise-tab-label { color: var(--accent-gold); }
+    .rise-tab.active .rise-tab-title { color: #ffffff; }
+    .rise-body { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.05fr); gap: 18px; margin-top: 18px; align-items: stretch; }
+    @media (max-width: 900px) { .rise-body { grid-template-columns: 1fr; } }
+    .card { border-radius: var(--radius-xl); padding: 16px 18px 18px; background: radial-gradient(circle at top left, rgba(247,213,139,0.12), transparent 55%), radial-gradient(circle at 150% 0, rgba(70,217,200,0.09), transparent 55%), rgba(8,6,30,0.9); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 18px 60px rgba(0,0,0,0.7); position: relative; overflow: hidden; }
+    .card-soft { background: radial-gradient(circle at top, rgba(124,92,255,0.18), transparent 60%), rgba(10,8,33,0.9); }
+    .card-header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .card-title { font-size: 13px; text-transform: uppercase; letter-spacing: 0.22em; color: rgba(167,162,200,0.92); }
+    .card-tag { font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; color: rgba(167,162,200,0.75); display: flex; align-items: center; gap: 8px; }
+    .card-tag-dot { width: 6px; height: 6px; border-radius: 999px; background: radial-gradient(circle, #46d9c8, #2aa499); box-shadow: 0 0 12px rgba(70,217,200,0.85); }
+    .card-mainline { font-family: "Cinzel", serif; font-size: clamp(18px, 2.5vw, 22px); letter-spacing: 0.06em; text-transform: uppercase; color: #ffffff; margin-bottom: 8px; }
+    .card-subline { font-size: 12px; color: var(--text-muted); max-width: 460px; line-height: 1.5; }
+    .greeting-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; margin-bottom: 6px; }
+    .greeting-prefix { font-size: 12px; text-transform: uppercase; letter-spacing: 0.24em; color: rgba(167,162,200,0.9); }
+    .greeting-name { font-size: 16px; font-weight: 500; color: var(--accent-gold); }
+    .greeting-date { font-size: 11px; color: rgba(167,162,200,0.9); margin-left: auto; text-transform: uppercase; letter-spacing: 0.18em; }
+    .affirmation-block { margin-top: 12px; padding: 12px 14px; border-radius: 18px; background: radial-gradient(circle at top left, rgba(247,213,139,0.18), transparent 70%), radial-gradient(circle at bottom right, rgba(124,92,255,0.18), transparent 70%), rgba(9,8,32,0.96); border: 1px solid rgba(247,213,139,0.32); display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden; }
+    .affirmation-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.26em; color: rgba(247,213,139,0.86); }
+    .affirmation-text { font-size: 15px; line-height: 1.6; color: var(--text-primary); }
+    .affirmation-tagline { font-size: 11px; color: rgba(167,162,200,0.85); display: flex; align-items: center; gap: 6px; }
+    .mini-divider { width: 24px; height: 1px; background: linear-gradient(90deg, rgba(247,213,139,0.8), transparent); }
+    .push-block { margin-top: 14px; padding: 12px 12px 13px; border-radius: 18px; background: linear-gradient(135deg, rgba(124,92,255,0.21), rgba(9,7,33,0.98)); border: 1px solid rgba(124,92,255,0.5); box-shadow: 0 16px 40px rgba(124,92,255,0.25); display: flex; flex-direction: column; gap: 5px; }
+    .push-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.22em; color: rgba(199,189,255,0.95); }
+    .push-text { font-size: 13px; line-height: 1.7; color: var(--text-primary); }
+    .push-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 10px; color: rgba(167,162,200,0.8); text-transform: uppercase; letter-spacing: 0.18em; }
+    .push-chip { padding: 4px 10px; border-radius: 999px; background: rgba(8,6,30,0.9); border: 1px solid rgba(247,213,139,0.35); color: rgba(247,213,139,0.9); font-size: 10px; letter-spacing: 0.18em; }
+    .weather-card { margin-top: 12px; padding: 11px 12px; border-radius: 16px; background: radial-gradient(circle at 110% 0%, rgba(70,217,200,0.18), transparent 65%), rgba(5,9,22,0.96); border: 1px solid rgba(70,217,200,0.4); display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 11px; color: rgba(189,214,255,0.9); }
+    .weather-left { display: flex; flex-direction: column; gap: 3px; }
+    .weather-heading { text-transform: uppercase; letter-spacing: 0.22em; font-size: 10px; color: rgba(154,203,232,0.95); }
+    .weather-main { font-size: 13px; font-weight: 500; }
+    .weather-cta { font-size: 10px; color: rgba(189,214,255,0.82); }
+    .weather-chip { padding: 6px 10px; border-radius: 999px; background: rgba(3,15,23,0.94); border: 1px dashed rgba(70,217,200,0.6); text-align: center; font-size: 10px; max-width: 170px; line-height: 1.4; }
+    .section-caption { font-size: 11px; color: rgba(167,162,200,0.9); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.16em; }
+    .intention-input { width: 100%; border-radius: 18px; border: 1px solid rgba(247,213,139,0.4); background: radial-gradient(circle at 0 0, rgba(247,213,139,0.12), transparent 70%), rgba(8,6,30,0.96); padding: 10px 12px 11px; font-size: 13px; color: var(--text-primary); outline: none; resize: none; min-height: 60px; line-height: 1.6; font-family: "Inter", sans-serif; }
+    .intention-input::placeholder { color: rgba(167,162,200,0.75); }
+    .field-group { margin-top: 14px; }
+    .field-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.20em; color: rgba(167,162,200,0.95); margin-bottom: 6px; }
+    .field-label span { color: rgba(247,213,139,0.92); }
+    .inputs-stack { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+    .input-row { position: relative; display: flex; align-items: center; gap: 8px; }
+    .input-index { width: 18px; height: 18px; border-radius: 999px; border: 1px solid rgba(247,213,139,0.5); display: flex; align-items: center; justify-content: center; font-size: 10px; color: rgba(247,213,139,0.95); background: radial-gradient(circle at 30% 20%, rgba(247,213,139,0.7), transparent 70%); }
+    .rise-input { flex: 1; padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.10); background: rgba(8,7,30,0.95); color: var(--text-primary); font-size: 12px; outline: none; font-family: "Inter", sans-serif; }
+    .rise-input::placeholder { color: rgba(167,162,200,0.85); }
+    .rise-input:focus { border-color: rgba(247,213,139,0.8); box-shadow: 0 0 0 1px rgba(247,213,139,0.4); }
+    .question-card { margin-top: 14px; padding: 11px 12px 12px; border-radius: 18px; background: radial-gradient(circle at top right, rgba(124,92,255,0.22), transparent 60%), radial-gradient(circle at bottom left, rgba(247,213,139,0.18), transparent 65%), rgba(7,6,28,0.96); border: 1px solid rgba(124,92,255,0.55); box-shadow: 0 16px 45px rgba(20,12,60,0.8); display: flex; flex-direction: column; gap: 6px; }
+    .question-header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+    .question-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.24em; color: rgba(199,189,255,0.95); }
+    .question-day { font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; color: rgba(199,189,255,0.8); }
+    .question-text { font-size: 13px; line-height: 1.7; color: #f3eeff; margin-top: 4px; }
+    .question-note { font-size: 10px; color: rgba(167,162,200,0.9); margin-top: 4px; }
+    .question-answer { margin-top: 8px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.10); background: rgba(8,7,30,0.96); padding: 8px 10px; min-height: 50px; font-size: 12px; color: var(--text-primary); resize: vertical; outline: none; width: 100%; font-family: "Inter", sans-serif; }
+    .question-answer::placeholder { color: rgba(167,162,200,0.8); }
+    .page { display: none; }
+    .page.active { display: block; }
+    .rise-footer { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 10px; color: rgba(167,162,200,0.85); text-transform: uppercase; letter-spacing: 0.18em; }
+    .footer-highlight { color: rgba(247,213,139,0.9); }
+    .footer-stars { font-size: 10px; letter-spacing: 0.4em; opacity: 0.7; }
+  </style>
+</head>
+<body>
+  <div class="rise-shell">
+    <div class="rise-shell-inner">
+      <div class="rise-topbar">
+        <div class="rise-brand">
+          <div class="rise-orb"></div>
+          <div class="rise-title">
+            <div class="rise-title-main">Rise</div>
+            <div class="rise-title-sub">Daily reset console</div>
+          </div>
+        </div>
+        <div class="rise-controls">
+          <div class="pill">
+            <span class="pill-label">Today</span>
+            <span class="pill-main" id="top-date-label">—</span>
+            <span class="pill-dot"></span>
+          </div>
+          <label class="pill-input">
+            <span>Name</span>
+            <input id="name-input" type="text" placeholder="You" autocomplete="off" />
+          </label>
+        </div>
+      </div>
+
+      <div class="rise-tabs">
+        <button class="rise-tab active" data-page="morning" type="button">
+          <div class="rise-tab-label">Page I</div>
+          <div class="rise-tab-title">Morning Brief</div>
+        </button>
+        <button class="rise-tab" data-page="day" type="button">
+          <div class="rise-tab-label">Page II</div>
+          <div class="rise-tab-title">Your Day</div>
+        </button>
+      </div>
+
+      <div class="rise-body page active" id="page-morning">
+        <section class="card card-soft">
+          <header class="card-header">
+            <div class="card-title">Morning brief</div>
+            <div class="card-tag"><span class="card-tag-dot"></span><span id="day-badge">—</span></div>
+          </header>
+          <div class="greeting-line">
+            <div>
+              <span class="greeting-prefix">Good morning, </span>
+              <span class="greeting-name" id="greeting-name">You</span>
+            </div>
+            <div class="greeting-date" id="greeting-date">—</div>
+          </div>
+          <div class="card-mainline">Reset your energy. Realign with what matters.</div>
+          <p class="card-subline">This is your quiet check‑in before the world asks anything of you. Breathe, read slowly, and decide how you'll move today.</p>
+          <div class="affirmation-block">
+            <div class="affirmation-label">Today's affirmation</div>
+            <div class="affirmation-text" id="affirmation-text">—</div>
+            <div class="affirmation-tagline"><div class="mini-divider"></div><span>Repeat this softly three times.</span></div>
+          </div>
+          <div class="push-block">
+            <div class="push-label">Your push today</div>
+            <p class="push-text" id="push-text">—</p>
+            <div class="push-meta"><span>From your inner coach</span><span class="push-chip">Tiny moves, big life</span></div>
+          </div>
+          <div class="weather-card">
+            <div class="weather-left">
+              <div class="weather-heading">Current weather</div>
+              <div class="weather-main">Weather in Hyderabad: <strong>28°</strong>, clear skies.</div>
+              <div class="weather-cta">Hook this into your favourite weather app when you're ready.</div>
+            </div>
+            <div class="weather-chip">Placeholder only — imagine the sky you want to walk under.</div>
+          </div>
+        </section>
+        <section class="card">
+          <header class="card-header">
+            <div class="card-title">Orientation</div>
+            <div class="card-tag"><span class="card-tag-dot" style="background: radial-gradient(circle,#f7d58b,#f2a95c); box-shadow: 0 0 12px rgba(247,213,139,0.85);"></span>Energetic check‑in</div>
+          </header>
+          <div class="section-caption">Take 15 seconds. Sense where you are arriving from.</div>
+          <div class="field-group">
+            <div class="field-label">One word for how I feel right now</div>
+            <input class="rise-input" style="width:100%; border-radius: 12px;" type="text" placeholder="e.g. tender, hopeful, scattered, powerful…" />
+          </div>
+          <div class="field-group" style="margin-top: 12px;">
+            <div class="field-label">What would make today feel <span>quietly successful</span>?</div>
+            <textarea class="intention-input" placeholder="Name the smallest version of success you're willing to commit to today."></textarea>
+          </div>
+        </section>
+      </div>
+
+      <div class="rise-body page" id="page-day">
+        <section class="card card-soft">
+          <header class="card-header">
+            <div class="card-title">Your day</div>
+            <div class="card-tag"><span class="card-tag-dot"></span>Designed with intention</div>
+          </header>
+          <div class="card-mainline">Make today move in the direction of your future self.</div>
+          <p class="card-subline">You don't need a perfect day — only a deliberate one.</p>
+          <div class="field-group" style="margin-top: 14px;">
+            <div class="field-label">Main intention for today</div>
+            <textarea class="intention-input" placeholder="If today gave you just one thing, what would you most want it to be?"></textarea>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Top <span>3</span> things today</div>
+            <div class="inputs-stack">
+              <div class="input-row"><div class="input-index">1</div><input class="rise-input" type="text" placeholder="Non‑negotiable move for Future You" /></div>
+              <div class="input-row"><div class="input-index">2</div><input class="rise-input" type="text" placeholder="One thing that lightens your body or mind" /></div>
+              <div class="input-row"><div class="input-index">3</div><input class="rise-input" type="text" placeholder="A small act of courage or honesty" /></div>
+            </div>
+          </div>
+        </section>
+        <section class="card">
+          <header class="card-header">
+            <div class="card-title">Deep check‑in</div>
+            <div class="card-tag"><span class="card-tag-dot"></span>Inner work today</div>
+          </header>
+          <div class="question-card">
+            <div class="question-header">
+              <div class="question-label">Today's reflection prompt</div>
+              <div class="question-day" id="question-day-label">—</div>
+            </div>
+            <div class="question-text" id="deep-question-text">—</div>
+            <div class="question-note">Answer in fragments, sentences, or single words. The point is contact, not perfection.</div>
+            <textarea class="question-answer" placeholder="Let your first, unedited thoughts land here."></textarea>
+          </div>
+        </section>
+      </div>
+
+      <footer class="rise-footer">
+        <div><span class="footer-highlight">RISE</span> · a private ritual for the first fifteen minutes of your day.</div>
+        <div class="footer-stars">✦ ✦ ✦ ✦ ✦</div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const nameInput = document.getElementById("name-input");
+      const greetingName = document.getElementById("greeting-name");
+      const greetingDate = document.getElementById("greeting-date");
+      const topDateLabel = document.getElementById("top-date-label");
+      const dayBadge = document.getElementById("day-badge");
+      const affirmationText = document.getElementById("affirmation-text");
+      const pushText = document.getElementById("push-text");
+      const questionText = document.getElementById("deep-question-text");
+      const questionDayLabel = document.getElementById("question-day-label");
+
+      const dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      const affirmations = [
+        "I honour the pace my soul needs, and still I am moving forward.",
+        "I am allowed to take up space, to ask for more, and to grow beyond who I've been.",
+        "I trust that every small, honest action today compounds into a life I'm proud of.",
+        "I can hold both tenderness and ambition; I don't have to choose between them.",
+        "I release the need to be perfect and choose to be present, curious, and alive.",
+        "I am not behind; I am exactly on time for the life I'm building.",
+        "I am safe to expand, to be seen, and to become the person I keep imagining."
+      ];
+      const pushes = [
+        "Today, move like someone who quietly believes their life is worth showing up for. Pick one space — your body, your work, or your relationships — and upgrade it by 1%.",
+        "Treat every interaction as a subtle rehearsal for the person you're becoming. Speak one sentence today with more honesty or more love than you normally would.",
+        "Your job today is not to fix your entire life; it's to choose one meaningful move and do it in a focused, undistracted way.",
+        "You've carried enough self‑doubt. For just one decision today, try assuming that you are fully capable and deeply supported.",
+        "There is something you've been postponing. Make a deliberately imperfect start today. Ugly beginnings are still sacred.",
+        "Aim for quiet excellence, not loud effort. Do one ordinary thing with extraordinary care.",
+        "Give yourself the gift of closure. Choose one small open loop and close it today."
+      ];
+      const deepQuestions = [
+        "If my life felt just 10% more peaceful three months from now, what would I have gently stopped tolerating?",
+        "Where am I currently abandoning my own needs to keep the peace, and what would a kinder boundary look like?",
+        "What am I afraid will happen if I fully back myself this week?",
+        "Which part of me feels the most unseen right now, and how could I let that part breathe today?",
+        "If I could receive one message from my future, wiser self this morning, what do I secretly hope they'd tell me?",
+        "What am I still punishing myself for, and what would change if today was the last day that story ran my life?",
+        "Where have I already proven I can do hard things, and how can I borrow that evidence for now?"
+      ];
+
+      nameInput.value = "Ritika";
+      greetingName.textContent = "Ritika";
+      nameInput.addEventListener("input", function() {
+        greetingName.textContent = nameInput.value.trim() || "You";
+      });
+
+      const now = new Date();
+      const dayIndex = now.getDay();
+      const readableDate = now.toLocaleDateString(undefined, { year:"numeric", month:"long", day:"numeric" });
+      const dayName = dayNames[dayIndex];
+      greetingDate.textContent = `${dayName.toUpperCase()} · ${readableDate}`;
+      topDateLabel.textContent = `${dayName} · ${readableDate}`;
+      dayBadge.textContent = `${dayName} energy`;
+      questionDayLabel.textContent = `${dayName.toUpperCase()} PROMPT`;
+      affirmationText.textContent = affirmations[dayIndex];
+      pushText.textContent = pushes[dayIndex];
+      questionText.textContent = deepQuestions[dayIndex];
+
+      document.querySelectorAll(".rise-tab").forEach(tab => {
+        tab.addEventListener("click", () => {
+          const target = tab.getAttribute("data-page");
+          document.querySelectorAll(".rise-tab").forEach(t => t.classList.toggle("active", t === tab));
+          document.getElementById("page-morning").classList.toggle("active", target === "morning");
+          document.getElementById("page-day").classList.toggle("active", target === "day");
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
